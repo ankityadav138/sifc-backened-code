@@ -8,7 +8,9 @@ const {
   getUserById,
   updateUser,
   updateUserStatus,
-  deleteUser
+  deleteUser,
+  getTelecallersByManager,
+  assignManager
 } = require("./user.controller");
 
 const authMiddleware = require("../../middlewares/auth.middleware");
@@ -27,6 +29,12 @@ router.get(
   "/",
   roleMiddleware("SUPER_ADMIN", "MANAGER"),
   getUsers
+);
+
+router.get(
+  "/manager/:managerId/telecallers",
+  // roleMiddleware("MANAGER"),
+  getTelecallersByManager
 );
 
 router.get(
@@ -52,5 +60,23 @@ router.delete(
   roleMiddleware("SUPER_ADMIN"),
   deleteUser
 );
+
+router.get(
+  '/',
+  roleMiddleware(
+    'SUPER_ADMIN',
+    'MANAGER',
+  ),
+  getUsers,
+);
+
+router.patch(
+  '/assign-manager',
+  roleMiddleware(
+    'SUPER_ADMIN',
+  ),
+  assignManager,
+);
+
 
 module.exports = router;

@@ -100,8 +100,107 @@ const teamCalls = async (req, res) => {
   }
 };
 
+const userCallLogs = async (
+  req,
+  res,
+) => {
+  try {
+    const {userId} = req.params;
+
+    // Manager access validation
+    if (
+      req.user.role ===
+      'MANAGER'
+    ) {
+      const User = require(
+        '../users/user.model',
+      );
+
+      const user =
+        await User.findById(
+          userId,
+        );
+
+      if (
+        !user ||
+        user.managerId.toString() !==
+          req.user.id
+      ) {
+        return res.status(403).json({
+          success: false,
+
+          message:
+            'Access denied',
+        });
+      }
+    }
+
+    const calls =
+      await CallLog.find({
+        userId,
+      })
+        .populate(
+          'userId',
+          'name phone role',
+        )
+        .sort({
+          createdAt: -1,
+        });
+
+    const formattedCalls =
+      calls.map(call => ({
+        id: call._id,
+
+        leadId: call.leadId,
+
+        leadName:
+          call.leadName,
+
+        phone: call.phone,
+
+        callStatus:
+          call.callStatus,
+
+        followUpDate:
+          call.followUpDate,
+
+        comments:
+          call.comments,
+
+        createdAt:
+          call.createdAt,
+
+        telecaller: {
+          id: call.userId._id,
+
+          name:
+            call.userId.name,
+
+          phone:
+            call.userId.phone,
+        },
+      }));
+
+    res.status(200).json({
+      success: true,
+
+      count:
+        formattedCalls.length,
+
+      data: formattedCalls,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createCall,
   myCalls,
-  teamCalls
+  teamCalls,
+  userCallLogs
 };

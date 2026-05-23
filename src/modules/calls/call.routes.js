@@ -5,7 +5,8 @@ const router = express.Router();
 const {
   createCall,
   myCalls,
-  teamCalls
+  teamCalls,
+  userCallLogs
 } = require("./call.controller");
 
 const authMiddleware = require(
@@ -43,6 +44,14 @@ router.get(
     "MANAGER"
   ),
   teamCalls
+);
+
+router.get(
+  "/user-call-logs/:userId",
+  roleMiddleware(
+    "MANAGER"
+  ),
+  userCallLogs
 );
 
 module.exports = router;

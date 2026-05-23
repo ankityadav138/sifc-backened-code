@@ -5,7 +5,9 @@ const router = express.Router();
 const {
   dsrReport,
   attendanceReport,
-  callReport
+  callReport,
+  telecallerSummary,
+  callSummary
 } = require(
   "./reports.controller"
 );
@@ -51,6 +53,27 @@ router.get(
   ),
 
   callReport
+);
+
+router.get(
+  '/telecaller-summary',
+
+  roleMiddleware(
+    'SUPER_ADMIN',
+    'MANAGER',
+  ),
+  telecallerSummary,
+);
+
+router.get(
+  '/call-summary',
+
+  roleMiddleware(
+    'SUPER_ADMIN',
+    'MANAGER',
+  ),
+
+  callSummary,
 );
 
 module.exports = router;

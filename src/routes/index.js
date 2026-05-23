@@ -46,4 +46,25 @@ router.use(
   reportRoutes
 );
 
+const managerRoutes = require(
+  '../modules/manager/manager.routes',
+);
+
+router.use(
+  '/manager',
+  managerRoutes,
+);
+
+const userCallRoutes = require(
+  '../modules/calls/call.routes',
+);
+
+router.use(
+  '/calls',
+  userCallRoutes,
+);
+
+
+
+
 module.exports = router;

@@ -198,11 +198,140 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getTelecallersByManager = async (req, res) => {
+  try {
+    const { managerId } = req.params;
+
+    // Managers can only fetch their own telecallers
+    if (
+      req.user.role === "MANAGER" &&
+      req.user.id !== managerId
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: cannot access other manager's telecallers"
+      });
+    }
+
+    const telecallers = await User.find({
+      role: "TELECALLER",
+      managerId
+    })
+      .select("-password")
+      .populate("managerId", "name phone");
+
+    res.status(200).json({
+      success: true,
+      count: telecallers.length,
+      data: telecallers
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const assignManager = async (
+  req,
+  res,
+) => {
+  try {
+    const {
+      telecallerId,
+      managerId,
+    } = req.body;
+
+    const User = require(
+      './user.model',
+    );
+
+    // Check telecaller exists
+    const telecaller =
+      await User.findById(
+        telecallerId,
+      );
+
+    if (!telecaller) {
+      return res.status(404).json({
+        success: false,
+
+        message:
+          'Telecaller not found',
+      });
+    }
+
+    // Check manager exists
+    const manager =
+      await User.findById(
+        managerId,
+      );
+
+    if (!manager) {
+      return res.status(404).json({
+        success: false,
+
+        message:
+          'Manager not found',
+      });
+    }
+
+    // Validate roles
+    if (
+      manager.role !==
+      'MANAGER'
+    ) {
+      return res.status(400).json({
+        success: false,
+
+        message:
+          'Selected user is not a manager',
+      });
+    }
+
+    if (
+      telecaller.role !==
+      'TELECALLER'
+    ) {
+      return res.status(400).json({
+        success: false,
+
+        message:
+          'Selected user is not a telecaller',
+      });
+    }
+
+    // Assign manager
+    telecaller.managerId =
+      managerId;
+
+    await telecaller.save();
+
+    res.status(200).json({
+      success: true,
+
+      message:
+        'Manager assigned successfully',
+
+      data: telecaller,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createUser,
   getUsers,
   getUserById,
   updateUser,
   updateUserStatus,
-  deleteUser
+  deleteUser,
+  getTelecallersByManager,
+  assignManager,
 };
