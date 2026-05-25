@@ -1,18 +1,50 @@
 const CallLog = require("./call.model");
+const User = require("../users/user.model");
 
 const createCall = async (req, res) => {
   try {
+    const isHR = req.user.role === "HR";
+
+    const creator = await User.findById(req.user.id).select("name");
+
     const {
       leadId,
       leadName,
       phone,
       callStatus,
       followUpDate,
-      comments
+      comments,
+      numberOfCalls,
+      interviewsScheduled,
+      interviewsConducted,
+      numberOfJoinings,
+      hrRemarks
     } = req.body;
+
+    const skipLeadValidation =
+      isHR ||
+      callStatus === "ANSWERED" ||
+      callStatus === "NOT_ANSWERED";
+
+    if (!skipLeadValidation) {
+      if (!leadId) {
+        return res.status(400).json({
+          success: false,
+          message: "leadId is required"
+        });
+      }
+      if (!comments) {
+        return res.status(400).json({
+          success: false,
+          message: "comments is required"
+        });
+      }
+    }
 
     const call = await CallLog.create({
       userId: req.user.id,
+      role: req.user.role,
+      createdByName: creator ? creator.name : req.user.name,
 
       leadId,
       leadName,
@@ -22,7 +54,13 @@ const createCall = async (req, res) => {
 
       followUpDate,
 
-      comments
+      comments,
+
+      numberOfCalls,
+      interviewsScheduled,
+      interviewsConducted,
+      numberOfJoinings,
+      hrRemarks
     });
 
     res.status(201).json({
@@ -61,8 +99,6 @@ const myCalls = async (req, res) => {
 
 const teamCalls = async (req, res) => {
   try {
-    const User = require("../users/user.model");
-
     let filter = {};
 
     if (req.user.role === "MANAGER") {

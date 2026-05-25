@@ -10,6 +10,8 @@ const submitDSR = async (req, res) => {
   try {
     const { finalRemarks } = req.body;
 
+    const creator = await User.findById(req.user.id).select("name");
+
     const today =
       moment().format("YYYY-MM-DD");
 
@@ -67,6 +69,8 @@ const submitDSR = async (req, res) => {
     if (!dsr) {
       dsr = await DSR.create({
         userId: req.user.id,
+        createdByName: creator ? creator.name : req.user.name,
+        role: req.user.role,
 
         date: today,
 
@@ -97,6 +101,8 @@ const submitDSR = async (req, res) => {
       dsr.finalRemarks =
         finalRemarks;
 
+      dsr.createdByName = creator ? creator.name : req.user.name;
+      dsr.role = req.user.role;
       dsr.isSubmitted = true;
 
       dsr.submittedAt = new Date();

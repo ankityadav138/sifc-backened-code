@@ -80,6 +80,7 @@ const login = async (req, res) => {
 
     const token = generateToken({
       id: user._id,
+      name: user.name,
       role: user.role
     });
 

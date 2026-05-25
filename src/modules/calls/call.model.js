@@ -9,8 +9,7 @@ const callSchema = new mongoose.Schema(
     },
 
     leadId: {
-      type: String,
-      required: true
+      type: String
     },
 
     leadName: {
@@ -40,8 +39,36 @@ const callSchema = new mongoose.Schema(
     },
 
     comments: {
+      type: String
+    },
+
+    numberOfCalls: {
+      type: Number
+    },
+
+    interviewsScheduled: {
+      type: Number
+    },
+
+    interviewsConducted: {
+      type: Number
+    },
+
+    numberOfJoinings: {
+      type: Number
+    },
+
+    hrRemarks: {
+      type: String
+    },
+
+    role: {
       type: String,
-      required: true
+      enum: ["SUPER_ADMIN", "MANAGER", "TELECALLER", "HR"]
+    },
+
+    createdByName: {
+      type: String
     }
   },
   {

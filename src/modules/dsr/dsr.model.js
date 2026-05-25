@@ -53,6 +53,15 @@ const dsrSchema = new mongoose.Schema(
 
     submittedAt: {
       type: Date
+    },
+
+    createdByName: {
+      type: String
+    },
+
+    role: {
+      type: String,
+      enum: ["SUPER_ADMIN", "MANAGER", "TELECALLER", "HR"]
     }
   },
   {

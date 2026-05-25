@@ -302,7 +302,7 @@ const telecallerSummary =
     }
   };
 
-  const callSummary = async (
+const callSummary = async (
   req,
   res,
 ) => {
@@ -316,28 +316,14 @@ const telecallerSummary =
 
     let matchFilter = {};
 
-    // Date filter
-    if (
-      startDate &&
-      endDate
-    ) {
+    // Date filter — include full end day
+    if (startDate && endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
       matchFilter.createdAt = {
         $gte: new Date(startDate),
-
-        $lte: new Date(endDate),
+        $lte: end,
       };
-    }
-
-    // Build user filter
-    let userFilter = {};
-
-    if (role) {
-      userFilter.role = role;
-    }
-
-    if (managerId) {
-      userFilter.managerId =
-        managerId;
     }
 
     const report =
@@ -345,11 +331,8 @@ const telecallerSummary =
         {
           $lookup: {
             from: 'users',
-
             localField: 'userId',
-
             foreignField: '_id',
-
             as: 'user',
           },
         },
@@ -367,8 +350,7 @@ const telecallerSummary =
             }),
 
             ...(managerId && {
-              'user.managerId':
-                managerId,
+              'user.managerId': new (require('mongoose').Types.ObjectId)(managerId),
             }),
           },
         },
@@ -440,6 +422,42 @@ const telecallerSummary =
               $max:
                 '$createdAt',
             },
+
+            numberOfCalls: {
+              $sum: {
+                $ifNull: [
+                  '$numberOfCalls',
+                  0,
+                ],
+              },
+            },
+
+            interviewsScheduled: {
+              $sum: {
+                $ifNull: [
+                  '$interviewsScheduled',
+                  0,
+                ],
+              },
+            },
+
+            interviewsConducted: {
+              $sum: {
+                $ifNull: [
+                  '$interviewsConducted',
+                  0,
+                ],
+              },
+            },
+
+            numberOfJoinings: {
+              $sum: {
+                $ifNull: [
+                  '$numberOfJoinings',
+                  0,
+                ],
+              },
+            },
           },
         },
 
@@ -460,6 +478,14 @@ const telecallerSummary =
             notAnswered: 1,
 
             lastCallTime: 1,
+
+            numberOfCalls: 1,
+
+            interviewsScheduled: 1,
+
+            interviewsConducted: 1,
+
+            numberOfJoinings: 1,
           },
         },
 
