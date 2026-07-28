@@ -23,7 +23,8 @@ router.post(
   "/",
   roleMiddleware(
     "TELECALLER",
-    "HR"
+    "HR",
+    "MANAGER"
   ),
   createCall
 );
@@ -34,7 +35,8 @@ router.get(
   "/my-calls",
   roleMiddleware(
     "TELECALLER",
-    "HR"
+    "HR",
+    "MANAGER"
   ),
   myCalls
 );

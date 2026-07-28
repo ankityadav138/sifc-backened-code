@@ -27,7 +27,7 @@ router.post(
 
 router.get(
   "/",
-  roleMiddleware("SUPER_ADMIN", "MANAGER"),
+  roleMiddleware("SUPER_ADMIN", "MANAGER", "SALES_EXECUTIVE"),
   getUsers
 );
 
@@ -66,6 +66,7 @@ router.get(
   roleMiddleware(
     'SUPER_ADMIN',
     'MANAGER',
+    'SALES_EXECUTIVE',
   ),
   getUsers,
 );

@@ -13,7 +13,8 @@ const registerSchema = z.object({
     "SUPER_ADMIN",
     "MANAGER",
     "TELECALLER",
-    "HR"
+    "HR",
+    "SALES_EXECUTIVE"
   ])
 });
 

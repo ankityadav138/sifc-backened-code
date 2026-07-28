@@ -8,6 +8,7 @@ const createCall = async (req, res) => {
     const creator = await User.findById(req.user.id).select("name");
 
     const {
+      userId,
       leadId,
       leadName,
       phone,
@@ -20,6 +21,25 @@ const createCall = async (req, res) => {
       numberOfJoinings,
       hrRemarks
     } = req.body;
+
+    let targetUserId = req.user.id;
+
+    if (req.user.role === "MANAGER") {
+      if (userId && userId !== req.user.id) {
+        const telecallerUser = await User.findById(userId);
+        if (
+          !telecallerUser ||
+          !telecallerUser.managerId ||
+          telecallerUser.managerId.toString() !== req.user.id
+        ) {
+          return res.status(403).json({
+            success: false,
+            message: "Access denied. You can only log calls for your assigned telecallers"
+          });
+        }
+        targetUserId = userId;
+      }
+    }
 
     const skipLeadValidation =
       isHR ||
@@ -42,7 +62,7 @@ const createCall = async (req, res) => {
     }
 
     const call = await CallLog.create({
-      userId: req.user.id,
+      userId: targetUserId,
       role: req.user.role,
       createdByName: creator ? creator.name : req.user.name,
 
@@ -205,6 +225,12 @@ const userCallLogs = async (
 
         createdAt:
           call.createdAt,
+
+        role:
+          call.role,
+
+        createdByName:
+          call.createdByName,
 
         telecaller: {
           id: call.userId._id,
