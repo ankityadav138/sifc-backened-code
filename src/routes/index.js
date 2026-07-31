@@ -64,7 +64,14 @@ router.use(
   userCallRoutes,
 );
 
+const clientVisitRoutes = require(
+  '../modules/clientVisits/clientVisit.routes',
+);
 
+router.use(
+  '/client-visits',
+  clientVisitRoutes,
+);
 
 
 module.exports = router;
