@@ -324,6 +324,22 @@ const assignManager = async (
     });
   }
 };
+const listByRole = (role) => async (req, res) => {
+  try {
+    const users = await User.find({ role })
+      .select('_id name phone')
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
 module.exports = {
   createUser,
@@ -334,4 +350,5 @@ module.exports = {
   deleteUser,
   getTelecallersByManager,
   assignManager,
+  listByRole,
 };

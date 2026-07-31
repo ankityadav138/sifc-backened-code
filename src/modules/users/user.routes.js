@@ -10,7 +10,8 @@ const {
   updateUserStatus,
   deleteUser,
   getTelecallersByManager,
-  assignManager
+  assignManager,
+  listByRole
 } = require("./user.controller");
 
 const authMiddleware = require("../../middlewares/auth.middleware");
@@ -61,21 +62,23 @@ router.delete(
   deleteUser
 );
 
-router.get(
-  '/',
-  roleMiddleware(
-    'SUPER_ADMIN',
-    'MANAGER',
-  ),
-  getUsers,
-);
-
 router.patch(
   '/assign-manager',
-  roleMiddleware(
-    'SUPER_ADMIN',
-  ),
+  roleMiddleware('SUPER_ADMIN'),
   assignManager,
+);
+
+// Accessible by SALES_EXECUTIVE to populate form dropdowns
+router.get(
+  '/list/managers',
+  roleMiddleware('SUPER_ADMIN', 'MANAGER', 'SALES_EXECUTIVE'),
+  listByRole('MANAGER'),
+);
+
+router.get(
+  '/list/telecallers',
+  roleMiddleware('SUPER_ADMIN', 'MANAGER', 'SALES_EXECUTIVE'),
+  listByRole('TELECALLER'),
 );
 
 
